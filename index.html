@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur ROI d'Automation - Phosphore Garden</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d3031 0%, #1a1b1c 100%);
+            min-height: 100vh;
+            color: #f9f5ef;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 30px;
+            background: #d4c1e1;
+            border-radius: 25px;
+            border: 2px solid #d4c1e1;
+        }
+
+        .header h1 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Avenir Next', 'Avenir', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2d3031;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            color: #2d3031;
+            font-weight: 300;
+        }
+
+        .brand-accent {
+            color: #2d3031;
+            font-weight: 700;
+            font-family: -apple-system, BlinkMacSystemFont, 'Avenir Next', 'Avenir', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(45, 48, 49, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 35px;
+            border: 2px solid #d4c1e1;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(212, 193, 225, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 20px rgba(233, 161, 61, 0.4);
+            border-color: #d4c1e1;
+        }
+
+        .card-title {
+            font-size: 1.6em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #d4c1e1;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #f9f5ef;
+            font-size: 1.05em;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #d4c1e1;
+            border-radius: 12px;
+            background: rgba(249, 245, 239, 0.1);
+            color: #f9f5ef;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: rgba(249, 245, 239, 0.6);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #e9a13d;
+            background: rgba(233, 161, 61, 0.1);
+            transform: scale(1.02);
+        }
+
+        .form-group select option {
+            background: #2d3031;
+            color: #f9f5ef;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
+            color: #2d3031;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #b8a5c9, #d4c1e1);
+        }
+
+        .results-section {
+            display: none;
+            grid-column: 1 / -1;
+            background: rgba(45, 48, 49, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 45px;
+            border: 2px solid #d4c1e1;
+            margin-top: 30px;
+            box-shadow: 0 15px 40px rgba(212, 193, 225, 0.15);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
+            padding: 30px;
+            border-radius: 18px;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: #2d3031;
+            border: 2px solid transparent;
+        }
+
+        .metric-card:hover {
+            transform: scale(1.05);
+            border-color: #e9a13d;
+        }
+
+        .metric-value {
+            font-size: 2.8em;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 1.1em;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .metric-positive {
+            background: linear-gradient(135deg, #4ba37b, #2f7458);
+            color: white;
+        }
+
+        .metric-negative {
+            background: linear-gradient(135deg, #e9a13d, #d4904a);
+            color: white;
+        }
+
+        .metric-neutral {
+            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
+            color: #2d3031;
+        }
+
+        .chart-container {
+            background: rgba(249, 245, 239, 0.05);
+            padding: 35px;
+            border-radius: 18px;
+            margin: 30px 0;
+            height: 400px;
+            border: 2px solid #d4c1e1;
+        }
+
+        .recommendations {
+            background: rgba(212, 193, 225, 0.1);
+            padding: 35px;
+            border-radius: 18px;
+            margin-top: 30px;
+            border-left: 6px solid #d4c1e1;
+            border: 2px solid #d4c1e1;
+        }
+
+        .recommendations h3 {
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            color: #d4c1e1;
+        }
+
+        .recommendations ul {
+            list-style: none;
+        }
+
+        .recommendations li {
+            margin-bottom: 18px;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .recommendations li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #e9a13d;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .cost-breakdown {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .cost-item {
+            background: rgba(212, 193, 225, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #d4c1e1;
+            transition: all 0.3s ease;
+        }
+
+        .cost-item:hover {
+            background: rgba(212, 193, 225, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #e9a13d, #d4904a);
+            color: white;
+            margin-top: 30px;
+        }
+
+        .export-btn:hover {
+            background: linear-gradient(135deg, #d4904a, #e9a13d);
+        }
+
+        .timeline-view {
+            margin: 30px 0;
+        }
+
+        .timeline-year {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(212, 193, 225, 0.1);
+            padding: 25px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 2px solid #d4c1e1;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-year:hover {
+            background: rgba(212, 193, 225, 0.2);
+            transform: translateX(5px);
+        }
+
+        .year-label {
+            font-weight: 600;
+            font-size: 1.2em;
+            color: #d4c1e1;
+        }
+
+        .year-savings {
+            font-size: 1.4em;
+            color: #4ba37b;
+            font-weight: 600;
+        }
+
+        .process-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .template-btn {
+            background: rgba(212, 193, 225, 0.2);
+            border: 2px solid #d4c1e1;
+            color: #f9f5ef;
+            padding: 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .template-btn:hover {
+            background: rgba(233, 161, 61, 0.3);
+            transform: scale(1.05);
+            border-color: #e9a13d;
+        }
+
+        .template-btn.active {
+            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
+            border-color: #d4c1e1;
+            color: #2d3031;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cost-breakdown {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .process-templates {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(212, 193, 225, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #d4c1e1;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .section-title {
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 35px;
+            color: #d4c1e1;
+            font-weight: 300;
+        }
+
+        .highlight {
+            color: #e9a13d;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="brand-accent">Calculateur de ROI et coût de l'inaction</span></h1>
+            <h2 style="color: #2d3031; margin-bottom: 15px;">pour solutions d'automatisation</h2>
+            <p class="subtitle">un outil développé et proposé par <a href="https://www.phosphoregarden.fr" target="_blank" style="color: #2d3031; text-decoration: none; font-weight: 500;">Phosphore Garden</a></p>
+        </div>
+
+        <div class="main-content">
+            <!-- Configuration du Process -->
+            <div class="card">
+                <div class="card-title">
+                    Configuration du Process
+                </div>
+
+                <div class="form-group">
+                    <label>Templates de Process</label>
+                    <div class="process-templates">
+                        <div class="template-btn" onclick="loadTemplate('rh')">RH / Recrutement</div>
+                        <div class="template-btn" onclick="loadTemplate('finance')">Finance / Compta</div>
+                        <div class="template-btn" onclick="loadTemplate('marketing')">Marketing</div>
+                        <div class="template-btn" onclick="loadTemplate('support')">Support Client</div>
+                        <div class="template-btn" onclick="loadTemplate('custom')">Personnalisé</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="processName">Nom du Process</label>
+                    <input type="text" id="processName" placeholder="Ex: Traitement des factures">
+                </div>
+
+                <div class="form-group">
+                    <label for="taskDescription">Description de la tâche</label>
+                    <textarea id="taskDescription" rows="3" placeholder="Décrivez les étapes manuelles actuelles..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="timePerTask">Temps par tâche (minutes)</label>
+                    <input type="number" id="timePerTask" placeholder="Ex: 45">
+                </div>
+
+                <div class="form-group">
+                    <label for="frequency">Fréquence par mois</label>
+                    <input type="number" id="frequency" placeholder="Ex: 200">
+                </div>
+
+                <div class="form-group">
+                    <label for="hourlyRate">Coût horaire employé (€)</label>
+                    <input type="number" id="hourlyRate" placeholder="Ex: 35">
+                </div>
+
+                <div class="form-group">
+                    <label for="errorRate">Taux d'erreur (%)</label>
+                    <input type="number" id="errorRate" placeholder="Ex: 5" value="5">
+                </div>
+
+                <div class="form-group">
+                    <label for="errorCost">Coût moyen d'une erreur (€)</label>
+                    <input type="number" id="errorCost" placeholder="Ex: 150">
+                </div>
+            </div>
+
+            <!-- Configuration de l'Automation -->
+            <div class="card">
+                <div class="card-title">
+                    Solution d'Automation
+                </div>
+
+                <div class="form-group">
+                    <label for="automationCost">Coût de développement (€)</label>
+                    <input type="number" id="automationCost" placeholder="Ex: 15000">
+                </div>
+
+                <div class="form-group">
+                    <label for="implementationTime">Temps d'implémentation (semaines)</label>
+                    <input type="number" id="implementationTime" placeholder="Ex: 8">
+                </div>
+
+                <div class="form-group">
+                    <label for="automationEfficiency">Efficacité de l'automation (%)</label>
+                    <input type="number" id="automationEfficiency" placeholder="Ex: 95" value="95">
+                </div>
+
+                <div class="form-group">
+                    <label for="maintenanceCost">Coût de maintenance annuel (€)</label>
+                    <input type="number" id="maintenanceCost" placeholder="Ex: 2000">
+                </div>
+
+                <div class="form-group">
+                    <label for="toolsCost">Coût des outils/licences annuel (€)</label>
+                    <input type="number" id="toolsCost" placeholder="Ex: 1200">
+                </div>
+
+                <div class="form-group">
+                    <label for="trainingCost">Coût de formation (€)</label>
+                    <input type="number" id="trainingCost" placeholder="Ex: 3000">
+                </div>
+
+                <button class="btn" onclick="calculateROI()">
+                    📊 Calculer le ROI
+                </button>
+            </div>
+        </div>
+
+        <!-- Section Résultats -->
+        <div class="results-section" id="resultsSection">
+            <div class="loading" id="loadingDiv">
+                <div class="spinner"></div>
+                <p style="color: #d4c1e1; font-size: 1.1em;">Analyse ROI en cours...</p>
+            </div>
+
+            <div id="resultsContent" style="display: none;">
+                <h2 class="section-title">
+                    Analyse ROI <span class="highlight">Complète</span>
+                </h2>
+
+                <!-- Métriques principales -->
+                <div class="results-grid">
+                    <div class="metric-card metric-positive">
+                        <div class="metric-value" id="totalSavings">0€</div>
+                        <div class="metric-label">Économies sur 3 ans</div>
+                    </div>
+                    <div class="metric-card metric-positive">
+                        <div class="metric-value" id="roiPercentage">0%</div>
+                        <div class="metric-label">Retour sur Investissement</div>
+                    </div>
+                    <div class="metric-card metric-neutral">
+                        <div class="metric-value" id="paybackPeriod">0 mois</div>
+                        <div class="metric-label">Période de Retour</div>
+                    </div>
+                    <div class="metric-card metric-negative">
+                        <div class="metric-value" id="inactionCost">0€</div>
+                        <div class="metric-label">Coût de l'Inaction (3 ans)</div>
+                    </div>
+                </div>
+
+                <!-- Graphique ROI dans le temps -->
+                <div class="chart-container">
+                    <canvas id="roiChart"></canvas>
+                </div>
+
+                <!-- Détail des coûts -->
+                <div class="cost-breakdown">
+                    <div class="cost-item">
+                        <span>Coût actuel annuel</span>
+                        <span id="currentAnnualCost">0€</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Coût avec automation annuel</span>
+                        <span id="automatedAnnualCost">0€</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Économies annuelles</span>
+                        <span id="annualSavings" class="highlight">0€</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Temps économisé par mois</span>
+                        <span id="timeSaved">0h</span>
+                    </div>
+                </div>
+
+                <!-- Timeline sur 3 ans -->
+                <div class="timeline-view">
+                    <h3 style="margin-bottom: 25px; color: #d4c1e1; font-size: 1.4em;">Projection sur 3 ans</h3>
+                    <div class="timeline-year">
+                        <span class="year-label">Année 1</span>
+                        <span class="year-savings" id="year1Savings">0€</span>
+                    </div>
+                    <div class="timeline-year">
+                        <span class="year-label">Année 2</span>
+                        <span class="year-savings" id="year2Savings">0€</span>
+                    </div>
+                    <div class="timeline-year">
+                        <span class="year-label">Année 3</span>
+                        <span class="year-savings" id="year3Savings">0€</span>
+                    </div>
+                </div>
+
+                <!-- Recommandations -->
+                <div class="recommendations">
+                    <h3>Recommandations Stratégiques</h3>
+                    <ul id="recommendationsList">
+                        <!-- Rempli dynamiquement -->
+                    </ul>
+                </div>
+
+                <!-- Boutons d'export -->
+                <button class="btn export-btn" onclick="generateReport()">
+                    📄 Générer Rapport PDF
+                </button>
+            </div>
+        </div>
+        
+        <!-- Footer avec logo -->
+        <div style="text-align: center; margin-top: 60px; padding: 30px;">
+            <a href="https://www.phosphoregarden.fr" target="_blank">
+                <img src="logo.png" alt="Phosphore Garden" style="height: 80px; opacity: 0.7; cursor: pointer;" onerror="this.outerHTML='<div style=\'color: #d4c1e1; font-size: 1.5em; font-weight: 300; cursor: pointer;\'>Phosphore<br>GARDEN</div>'">
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Templates de process prédéfinis
+        const processTemplates = {
+            rh: {
+                name: "Traitement des candidatures",
+                description: "Tri CV, planification entretiens, suivi candidats",
+                timePerTask: 30,
+                frequency: 150,
+                hourlyRate: 40,
+                errorRate: 8,
+                errorCost: 200
+            },
+            finance: {
+                name: "Traitement des factures",
+                description: "Saisie, validation, rapprochement bancaire",
+                timePerTask: 25,
+                frequency: 300,
+                hourlyRate: 35,
+                errorRate: 3,
+                errorCost: 500
+            },
+            marketing: {
+                name: "Qualification des leads",
+                description: "Analyse leads, scoring, attribution commerciaux",
+                timePerTask: 15,
+                frequency: 400,
+                hourlyRate: 30,
+                errorRate: 10,
+                errorCost: 100
+            },
+            support: {
+                name: "Traitement tickets support",
+                description: "Catégorisation, routage, réponses standard",
+                timePerTask: 20,
+                frequency: 250,
+                hourlyRate: 25,
+                errorRate: 5,
+                errorCost: 80
+            }
+        };
+
+        let roiChart = null;
+
+        function loadTemplate(templateType) {
+            // Mettre à jour les boutons
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            if (templateType === 'custom') {
+                // Vider les champs pour un template personnalisé
+                document.getElementById('processName').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('timePerTask').value = '';
+                document.getElementById('frequency').value = '';
+                document.getElementById('hourlyRate').value = '';
+                document.getElementById('errorRate').value = '';
+                document.getElementById('errorCost').value = '';
+                return;
+            }
+
+            const template = processTemplates[templateType];
+            if (template) {
+                document.getElementById('processName').value = template.name;
+                document.getElementById('taskDescription').value = template.description;
+                document.getElementById('timePerTask').value = template.timePerTask;
+                document.getElementById('frequency').value = template.frequency;
+                document.getElementById('hourlyRate').value = template.hourlyRate;
+                document.getElementById('errorRate').value = template.errorRate;
+                document.getElementById('errorCost').value = template.errorCost;
+            }
+        }
+
+        function calculateROI() {
+            // Récupérer les valeurs
+            const timePerTask = parseFloat(document.getElementById('timePerTask').value) || 0;
+            const frequency = parseFloat(document.getElementById('frequency').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const errorRate = parseFloat(document.getElementById('errorRate').value) || 0;
+            const errorCost = parseFloat(document.getElementById('errorCost').value) || 0;
+            
+            const automationCost = parseFloat(document.getElementById('automationCost').value) || 0;
+            const maintenanceCost = parseFloat(document.getElementById('maintenanceCost').value) || 0;
+            const toolsCost = parseFloat(document.getElementById('toolsCost').value) || 0;
+            const trainingCost = parseFloat(document.getElementById('trainingCost').value) || 0;
+            const automationEfficiency = parseFloat(document.getElementById('automationEfficiency').value) || 95;
+
+            // Validation
+            if (timePerTask === 0 || frequency === 0 || hourlyRate === 0) {
+                alert('Veuillez remplir au minimum le temps par tâche, la fréquence et le coût horaire.');
+                return;
+            }
+
+            // Afficher la section résultats avec loading
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('loadingDiv').style.display = 'block';
+            document.getElementById('resultsContent').style.display = 'none';
+
+            // Simuler un délai de calcul
+            setTimeout(() => {
+                // Calculs
+                const monthlyTimeSpent = (timePerTask / 60) * frequency; // heures
+                const currentMonthlyCost = monthlyTimeSpent * hourlyRate;
+                const currentAnnualCost = currentMonthlyCost * 12;
+                
+                const monthlyErrors = (frequency * errorRate) / 100;
+                const monthlyErrorCost = monthlyErrors * errorCost;
+                const annualErrorCost = monthlyErrorCost * 12;
+                
+                const totalCurrentAnnualCost = currentAnnualCost + annualErrorCost;
+                
+                // Coûts avec automation
+                const automatedTimeSpent = monthlyTimeSpent * (1 - automationEfficiency / 100);
+                const automatedMonthlyCost = automatedTimeSpent * hourlyRate;
+                const automatedAnnualCost = automatedMonthlyCost * 12 + maintenanceCost + toolsCost;
+                
+                const annualSavings = totalCurrentAnnualCost - automatedAnnualCost;
+                const totalInvestment = automationCost + trainingCost;
+                
+                // Calculs sur 3 ans
+                const year1Savings = annualSavings - totalInvestment;
+                const year2Savings = annualSavings;
+                const year3Savings = annualSavings;
+                const totalSavings3Years = year1Savings + year2Savings + year3Savings;
+                
+                const roi = ((totalSavings3Years / totalInvestment) * 100);
+                const paybackMonths = Math.ceil(totalInvestment / annualSavings * 12);
+                
+                const inactionCost = totalCurrentAnnualCost * 3;
+                
+                // Afficher les résultats
+                document.getElementById('totalSavings').textContent = formatCurrency(totalSavings3Years);
+                document.getElementById('roiPercentage').textContent = Math.round(roi) + '%';
+                document.getElementById('paybackPeriod').textContent = paybackMonths + ' mois';
+                document.getElementById('inactionCost').textContent = formatCurrency(inactionCost);
+                
+                document.getElementById('currentAnnualCost').textContent = formatCurrency(totalCurrentAnnualCost);
+                document.getElementById('automatedAnnualCost').textContent = formatCurrency(automatedAnnualCost);
+                document.getElementById('annualSavings').textContent = formatCurrency(annualSavings);
+                document.getElementById('timeSaved').textContent = Math.round(monthlyTimeSpent - automatedTimeSpent) + 'h';
+                
+                document.getElementById('year1Savings').textContent = formatCurrency(year1Savings);
+                document.getElementById('year2Savings').textContent = formatCurrency(year2Savings);
+                document.getElementById('year3Savings').textContent = formatCurrency(year3Savings);
+                
+                // Générer les recommandations
+                generateRecommendations(roi, paybackMonths, annualSavings);
+                
+                // Créer le graphique
+                createROIChart(totalInvestment, year1Savings, year2Savings, year3Savings);
+                
+                // Masquer le loading et afficher les résultats
+                document.getElementById('loadingDiv').style.display = 'none';
+                document.getElementById('resultsContent').style.display = 'block';
+                
+                // Scroll vers les résultats
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function generateRecommendations(roi, paybackMonths, annualSavings) {
+            const recommendations = [];
+            
+            if (roi > 200) {
+                recommendations.push("ROI excellent (+" + Math.round(roi) + "%) - Priorité MAXIMUM pour ce projet");
+            } else if (roi > 100) {
+                recommendations.push("ROI très intéressant - Projet hautement recommandé");
+            } else if (roi > 50) {
+                recommendations.push("ROI correct - Projet viable à moyen terme");
+            } else {
+                recommendations.push("ROI faible - Revoir les paramètres ou repenser l'approche");
+            }
+            
+            if (paybackMonths <= 12) {
+                recommendations.push("Retour sur investissement rapide (< 1 an) - Excellent argument commercial");
+            } else if (paybackMonths <= 24) {
+                recommendations.push("Retour sur investissement raisonnable (< 2 ans)");
+            }
+            
+            if (annualSavings > 50000) {
+                recommendations.push("Économies substantielles - Impact significatif sur la rentabilité");
+            }
+            
+            recommendations.push("Commencer par un pilote sur une partie du process pour valider les gains");
+            recommendations.push("Prévoir une formation équipe pour maximiser l'adoption");
+            recommendations.push("Mettre en place des KPIs de suivi pour mesurer les bénéfices réels");
+            
+            const list = document.getElementById('recommendationsList');
+            list.innerHTML = '';
+            recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                list.appendChild(li);
+            });
+        }
+
+        function createROIChart(investment, year1, year2, year3) {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            if (roiChart) {
+                roiChart.destroy();
+            }
+            
+            roiChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Investissement Initial', 'Fin Année 1', 'Fin Année 2', 'Fin Année 3'],
+                    datasets: [{
+                        label: 'ROI Cumulé (€)',
+                        data: [-investment, year1 - investment, year1 + year2 - investment, year1 + year2 + year3 - investment],
+                        borderColor: '#4ba37b',
+                        backgroundColor: 'rgba(75, 163, 123, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Évolution du ROI sur 3 ans',
+                            color: '#f9f5ef',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            labels: { color: '#f9f5ef' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                color: '#f9f5ef',
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(249, 245, 239, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#f9f5ef'
+                            },
+                            grid: {
+                                color: 'rgba(249, 245, 239, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configuration
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 20;
+            let yPosition = 30;
+            
+            // Header avec logo et titre
+            doc.setFontSize(20);
+            doc.setTextColor(45, 48, 49); // Couleur sombre
+            doc.text('Rapport ROI d\'Automation', pageWidth/2, yPosition, { align: 'center' });
+            
+            yPosition += 10;
+            doc.setFontSize(12);
+            doc.setTextColor(212, 193, 225); // Couleur violette
+            doc.text('Phosphore Garden', pageWidth/2, yPosition, { align: 'center' });
+            
+            yPosition += 30;
+            
+            // Informations du projet
+            doc.setFontSize(14);
+            doc.setTextColor(45, 48, 49);
+            doc.text('Projet analysé:', margin, yPosition);
+            yPosition += 8;
+            
+            doc.setFontSize(12);
+            const processName = document.getElementById('processName').value || 'Non spécifié';
+            doc.text(`Process: ${processName}`, margin, yPosition);
+            yPosition += 6;
+            
+            const taskDesc = document.getElementById('taskDescription').value || 'Non spécifié';
+            const wrappedDesc = doc.splitTextToSize(`Description: ${taskDesc}`, pageWidth - 2 * margin);
+            doc.text(wrappedDesc, margin, yPosition);
+            yPosition += wrappedDesc.length * 6 + 10;
+            
+            // Métriques principales
+            doc.setFontSize(16);
+            doc.setTextColor(233, 161, 61); // Couleur dorée
+            doc.text('Résultats financiers', margin, yPosition);
+            yPosition += 15;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(45, 48, 49);
+            
+            const totalSavings = document.getElementById('totalSavings').textContent;
+            const roiPercentage = document.getElementById('roiPercentage').textContent;
+            const paybackPeriod = document.getElementById('paybackPeriod').textContent;
+            const inactionCost = document.getElementById('inactionCost').textContent;
+            
+            doc.text(`• Économies sur 3 ans: ${totalSavings}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Retour sur investissement: ${roiPercentage}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Période de retour: ${paybackPeriod}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Coût de l'inaction: ${inactionCost}`, margin, yPosition);
+            yPosition += 20;
+            
+            // Détail des coûts
+            doc.setFontSize(16);
+            doc.setTextColor(233, 161, 61);
+            doc.text('Détail des coûts', margin, yPosition);
+            yPosition += 15;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(45, 48, 49);
+            
+            const currentCost = document.getElementById('currentAnnualCost').textContent;
+            const automatedCost = document.getElementById('automatedAnnualCost').textContent;
+            const annualSavings = document.getElementById('annualSavings').textContent;
+            const timeSaved = document.getElementById('timeSaved').textContent;
+            
+            doc.text(`• Coût actuel annuel: ${currentCost}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Coût avec automation: ${automatedCost}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Économies annuelles: ${annualSavings}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Temps économisé/mois: ${timeSaved}`, margin, yPosition);
+            yPosition += 20;
+            
+            // Projection 3 ans
+            doc.setFontSize(16);
+            doc.setTextColor(233, 161, 61);
+            doc.text('Projection sur 3 ans', margin, yPosition);
+            yPosition += 15;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(45, 48, 49);
+            
+            const year1 = document.getElementById('year1Savings').textContent;
+            const year2 = document.getElementById('year2Savings').textContent;
+            const year3 = document.getElementById('year3Savings').textContent;
+            
+            doc.text(`• Année 1: ${year1}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Année 2: ${year2}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`• Année 3: ${year3}`, margin, yPosition);
+            yPosition += 20;
+            
+            // Recommandations
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 30;
+            }
+            
+            doc.setFontSize(16);
+            doc.setTextColor(233, 161, 61);
+            doc.text('Recommandations', margin, yPosition);
+            yPosition += 15;
+            
+            doc.setFontSize(11);
+            doc.setTextColor(45, 48, 49);
+            
+            const recommendations = document.querySelectorAll('#recommendationsList li');
+            recommendations.forEach(rec => {
+                const text = `• ${rec.textContent}`;
+                const wrappedText = doc.splitTextToSize(text, pageWidth - 2 * margin);
+                doc.text(wrappedText, margin, yPosition);
+                yPosition += wrappedText.length * 6 + 3;
+                
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 30;
+                }
+            });
+            
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10);
+                doc.setTextColor(150, 150, 150);
+                doc.text('Rapport généré par Phosphore Garden', pageWidth/2, 285, { align: 'center' });
+                doc.text(`Page ${i} sur ${pageCount}`, pageWidth - margin, 285, { align: 'right' });
+                
+                const today = new Date().toLocaleDateString('fr-FR');
+                doc.text(today, margin, 285);
+            }
+            
+            // Télécharger le PDF
+            const fileName = `rapport-roi-${processName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+        }
+    </script>
+</body>
+</html>
