@@ -4,13 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculateur ROI d'Automation - Phosphore Garden</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="shortcut icon" type="image/png" href="favicon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
         * {
             margin: 0;
             padding: 0;
@@ -22,7 +17,6 @@
             background: linear-gradient(135deg, #2d3031 0%, #1a1b1c 100%);
             min-height: 100vh;
             color: #f9f5ef;
-            overflow-x: hidden;
         }
 
         .container {
@@ -37,50 +31,21 @@
             padding: 40px 30px;
             background: #d4c1e1;
             border-radius: 25px;
-            border: 2px solid #d4c1e1;
+            color: #2d3031;
         }
 
         .header h1 {
-            font-family: -apple-system, BlinkMacSystemFont, 'Avenir Next', 'Avenir', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
             font-size: 2.8em;
             font-weight: 700;
             margin-bottom: 15px;
-            color: #2d3031;
-        }
-
-        .header .subtitle {
-            font-size: 1.1em;
-            color: #2d3031;
-            font-weight: 300;
-        }
-
-        .brand-accent {
-            color: #2d3031;
-            font-weight: 700;
-            font-family: -apple-system, BlinkMacSystemFont, 'Avenir Next', 'Avenir', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
         }
 
         .card {
             background: rgba(45, 48, 49, 0.8);
-            backdrop-filter: blur(10px);
             border-radius: 25px;
             padding: 35px;
             border: 2px solid #d4c1e1;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(212, 193, 225, 0.1);
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 0 20px rgba(233, 161, 61, 0.4);
-            border-color: #d4c1e1;
+            margin-bottom: 30px;
         }
 
         .card-title {
@@ -88,6 +53,128 @@
             font-weight: 600;
             margin-bottom: 25px;
             color: #d4c1e1;
+        }
+
+        .process-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .template-btn {
+            background: rgba(212, 193, 225, 0.2);
+            border: 2px solid #d4c1e1;
+            color: #f9f5ef;
+            padding: 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .template-btn:hover {
+            background: rgba(167, 216, 195, 0.3);
+            transform: scale(1.05);
+            border-color: #4ba37b;
+        }
+
+        .template-btn.active {
+            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
+            border-color: #d4c1e1;
+            color: #2d3031;
+        }
+
+        .wizard-step {
+            display: none;
+        }
+
+        .wizard-step.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: rgba(212, 193, 225, 0.2);
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 30px;
+            display: flex;
+        }
+
+        .progress-step {
+            flex: 1;
+            background: transparent;
+            padding: 15px 10px;
+            text-align: center;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .progress-step.active {
+            background: #d4c1e1;
+            color: #2d3031;
+        }
+
+        .progress-step.completed {
+            background: #4ba37b;
+            color: white;
+        }
+
+        .wizard-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .wizard-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .wizard-btn.prev {
+            background: rgba(212, 193, 225, 0.3);
+            color: #f9f5ef;
+            border: 2px solid #d4c1e1;
+        }
+
+        .wizard-btn.next {
+            background: linear-gradient(135deg, #4ba37b, #2f7458);
+            color: white;
+        }
+
+        .wizard-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .validation-message {
+            font-size: 0.9em;
+            margin-top: 5px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .validation-success {
+            background: rgba(75, 163, 123, 0.2);
+            color: #4ba37b;
+            border-left: 3px solid #4ba37b;
+        }
+
+        .validation-error {
+            background: rgba(212, 193, 225, 0.2);
+            color: #d4c1e1;
+            border-left: 3px solid #d4c1e1;
         }
 
         .form-group {
@@ -119,19 +206,13 @@
 
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
-            border-color: #e9a13d;
-            background: rgba(233, 161, 61, 0.1);
-            transform: scale(1.02);
-        }
-
-        .form-group select option {
-            background: #2d3031;
-            color: #f9f5ef;
+            border-color: #4ba37b;
+            background: rgba(75, 163, 123, 0.1);
         }
 
         .btn {
-            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
-            color: #2d3031;
+            background: linear-gradient(135deg, #4ba37b, #2f7458);
+            color: white;
             border: none;
             padding: 16px 32px;
             border-radius: 12px;
@@ -145,19 +226,48 @@
 
         .btn:hover {
             transform: translateY(-3px);
-            background: linear-gradient(135deg, #b8a5c9, #d4c1e1);
+            background: linear-gradient(135deg, #2f7458, #4ba37b);
+        }
+
+        .help-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 8px;
+            cursor: help;
+        }
+
+        .help-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 300px;
+            background: rgba(75, 163, 123, 0.95);
+            color: white;
+            text-align: left;
+            border-radius: 10px;
+            padding: 15px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            line-height: 1.4;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .help-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
         .results-section {
             display: none;
-            grid-column: 1 / -1;
             background: rgba(45, 48, 49, 0.9);
-            backdrop-filter: blur(10px);
             border-radius: 25px;
             padding: 45px;
             border: 2px solid #d4c1e1;
             margin-top: 30px;
-            box-shadow: 0 15px 40px rgba(212, 193, 225, 0.15);
         }
 
         .results-grid {
@@ -168,18 +278,10 @@
         }
 
         .metric-card {
-            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
             padding: 30px;
             border-radius: 18px;
             text-align: center;
             transition: all 0.3s ease;
-            color: #2d3031;
-            border: 2px solid transparent;
-        }
-
-        .metric-card:hover {
-            transform: scale(1.05);
-            border-color: #e9a13d;
         }
 
         .metric-value {
@@ -200,176 +302,13 @@
         }
 
         .metric-negative {
-            background: linear-gradient(135deg, #e9a13d, #d4904a);
-            color: white;
+            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
+            color: #2d3031;
         }
 
         .metric-neutral {
             background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
             color: #2d3031;
-        }
-
-        .chart-container {
-            background: rgba(249, 245, 239, 0.05);
-            padding: 35px;
-            border-radius: 18px;
-            margin: 30px 0;
-            height: 400px;
-            border: 2px solid #d4c1e1;
-        }
-
-        .recommendations {
-            background: rgba(212, 193, 225, 0.1);
-            padding: 35px;
-            border-radius: 18px;
-            margin-top: 30px;
-            border-left: 6px solid #d4c1e1;
-            border: 2px solid #d4c1e1;
-        }
-
-        .recommendations h3 {
-            margin-bottom: 25px;
-            font-size: 1.5em;
-            color: #d4c1e1;
-        }
-
-        .recommendations ul {
-            list-style: none;
-        }
-
-        .recommendations li {
-            margin-bottom: 18px;
-            padding-left: 30px;
-            position: relative;
-            line-height: 1.6;
-        }
-
-        .recommendations li:before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: #e9a13d;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .cost-breakdown {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            margin: 30px 0;
-        }
-
-        .cost-item {
-            background: rgba(212, 193, 225, 0.1);
-            padding: 25px;
-            border-radius: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 2px solid #d4c1e1;
-            transition: all 0.3s ease;
-        }
-
-        .cost-item:hover {
-            background: rgba(212, 193, 225, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .export-btn {
-            background: linear-gradient(135deg, #e9a13d, #d4904a);
-            color: white;
-            margin-top: 30px;
-        }
-
-        .export-btn:hover {
-            background: linear-gradient(135deg, #d4904a, #e9a13d);
-        }
-
-        .timeline-view {
-            margin: 30px 0;
-        }
-
-        .timeline-year {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(212, 193, 225, 0.1);
-            padding: 25px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border: 2px solid #d4c1e1;
-            transition: all 0.3s ease;
-        }
-
-        .timeline-year:hover {
-            background: rgba(212, 193, 225, 0.2);
-            transform: translateX(5px);
-        }
-
-        .year-label {
-            font-weight: 600;
-            font-size: 1.2em;
-            color: #d4c1e1;
-        }
-
-        .year-savings {
-            font-size: 1.4em;
-            color: #4ba37b;
-            font-weight: 600;
-        }
-
-        .process-templates {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .template-btn {
-            background: rgba(212, 193, 225, 0.2);
-            border: 2px solid #d4c1e1;
-            color: #f9f5ef;
-            padding: 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .template-btn:hover {
-            background: rgba(233, 161, 61, 0.3);
-            transform: scale(1.05);
-            border-color: #e9a13d;
-        }
-
-        .template-btn.active {
-            background: linear-gradient(135deg, #d4c1e1, #b8a5c9);
-            border-color: #d4c1e1;
-            color: #2d3031;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .cost-breakdown {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2.2em;
-            }
-            
-            .process-templates {
-                grid-template-columns: 1fr;
-            }
         }
 
         .loading {
@@ -401,113 +340,256 @@
         }
 
         .highlight {
-            color: #e9a13d;
+            color: #4ba37b;
             font-weight: 600;
+        }
+
+        .chart-container {
+            background: rgba(249, 245, 239, 0.05);
+            padding: 35px;
+            border-radius: 18px;
+            margin: 30px 0;
+            height: 400px;
+            border: 2px solid #d4c1e1;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1><span class="brand-accent">Calculateur de ROI et coût de l'inaction</span></h1>
-            <h2 style="color: #2d3031; margin-bottom: 15px;">pour solutions d'automatisation</h2>
-            <p class="subtitle">un outil développé et proposé par <a href="https://www.phosphoregarden.fr" target="_blank" style="color: #2d3031; text-decoration: none; font-weight: 500;">Phosphore Garden</a></p>
+            <h1>Calculateur de ROI et coût de l'inaction</h1>
+            <h2>pour solutions d'automatisation</h2>
+            <p style="margin-top: 20px;">un outil développé et proposé par <a href="https://www.phosphoregarden.fr" target="_blank" style="color: #2d3031; text-decoration: none; font-weight: 500;">Phosphore Garden</a></p>
         </div>
 
-        <div class="main-content">
-            <!-- Configuration du Process -->
+        <!-- Barre de progression -->
+        <div class="progress-bar">
+            <div class="progress-step active" id="step1-indicator">1. Secteur</div>
+            <div class="progress-step" id="step2-indicator">2. Process</div>
+            <div class="progress-step" id="step3-indicator">3. Automation</div>
+        </div>
+
+        <!-- Étape 1: Choix du secteur -->
+        <div class="wizard-step active" id="step1">
             <div class="card">
-                <div class="card-title">
-                    Configuration du Process
+                <div class="card-title">🎯 Étape 1: Choisissez votre secteur d'activité</div>
+                
+                <div class="process-templates">
+                    <div class="template-btn" data-sector="rh">🧑‍💼 RH / Recrutement</div>
+                    <div class="template-btn" data-sector="finance">💰 Finance / Compta</div>
+                    <div class="template-btn" data-sector="marketing">📈 Marketing</div>
+                    <div class="template-btn" data-sector="support">🎧 Support Client</div>
+                    <div class="template-btn" data-sector="sante">🏥 Santé</div>
+                    <div class="template-btn" data-sector="juridique">⚖️ Juridique</div>
+                    <div class="template-btn" data-sector="ecommerce">🛒 E-commerce</div>
+                    <div class="template-btn" data-sector="industrie">🏭 Industrie</div>
+                    <div class="template-btn" data-sector="custom">⚙️ Personnalisé</div>
+                </div>
+                <div class="validation-message" id="step1-validation"></div>
+            </div>
+        </div>
+
+        <!-- Étape 2: Configuration du process -->
+        <div class="wizard-step" id="step2">
+            <div class="card">
+                <div class="card-title">⚙️ Étape 2: Décrivez votre process actuel</div>
+
+                <div class="form-group">
+                    <label for="processName">Nom du process 
+                        <span class="help-tooltip">ℹ️
+                            <span class="tooltip-text">
+                                Donnez un nom explicite à votre process (ex: "Traitement des factures", 
+                                "Gestion des candidatures"). Ce nom apparaîtra dans le rapport final.
+                            </span>
+                        </span>
+                    </label>
+                    <input type="text" id="processName" placeholder="Ex: Traitement des factures">
+                    <div class="validation-message" id="processName-validation"></div>
                 </div>
 
                 <div class="form-group">
-                    <label>Templates de Process</label>
-                    <div class="process-templates">
-                        <div class="template-btn" onclick="loadTemplate('rh')">RH / Recrutement</div>
-                        <div class="template-btn" onclick="loadTemplate('finance')">Finance / Compta</div>
-                        <div class="template-btn" onclick="loadTemplate('marketing')">Marketing</div>
-                        <div class="template-btn" onclick="loadTemplate('support')">Support Client</div>
-                        <div class="template-btn" onclick="loadTemplate('custom')">Personnalisé</div>
+                    <label for="taskDescription">Description détaillée 
+                        <span class="help-tooltip">ℹ️
+                            <span class="tooltip-text">
+                                Décrivez les étapes manuelles actuelles. Plus c'est détaillé, 
+                                plus l'analyse sera précise et le rapport convaincant.
+                            </span>
+                        </span>
+                    </label>
+                    <textarea id="taskDescription" rows="3" placeholder="Décrivez les étapes manuelles actuelles..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="timePerTask">Temps par tâche (minutes) 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Temps moyen pour accomplir une occurrence de cette tâche. 
+                                    Incluez le temps de recherche, saisie, validation.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="timePerTask" placeholder="Ex: 45">
+                        <div class="validation-message" id="timePerTask-validation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frequency">Fréquence par mois 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Nombre de fois que cette tâche est réalisée par mois. 
+                                    Basez-vous sur une moyenne sur l'année.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="frequency" placeholder="Ex: 200">
+                        <div class="validation-message" id="frequency-validation"></div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="hourlyRate">Coût horaire employé (€) 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Coût chargé de l'employé (salaire + charges + overhead). 
+                                    En moyenne 1.5x le salaire brut.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="hourlyRate" placeholder="Ex: 35">
+                        <div class="validation-message" id="hourlyRate-validation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="errorRate">Taux d'erreur (%) 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Pourcentage de tâches nécessitant une correction ou 
+                                    générant une erreur. Soyez réaliste !
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="errorRate" placeholder="Ex: 5" value="5">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="processName">Nom du Process</label>
-                    <input type="text" id="processName" placeholder="Ex: Traitement des factures">
-                </div>
-
-                <div class="form-group">
-                    <label for="taskDescription">Description de la tâche</label>
-                    <textarea id="taskDescription" rows="3" placeholder="Décrivez les étapes manuelles actuelles..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="timePerTask">Temps par tâche (minutes)</label>
-                    <input type="number" id="timePerTask" placeholder="Ex: 45">
-                </div>
-
-                <div class="form-group">
-                    <label for="frequency">Fréquence par mois</label>
-                    <input type="number" id="frequency" placeholder="Ex: 200">
-                </div>
-
-                <div class="form-group">
-                    <label for="hourlyRate">Coût horaire employé (€)</label>
-                    <input type="number" id="hourlyRate" placeholder="Ex: 35">
-                </div>
-
-                <div class="form-group">
-                    <label for="errorRate">Taux d'erreur (%)</label>
-                    <input type="number" id="errorRate" placeholder="Ex: 5" value="5">
-                </div>
-
-                <div class="form-group">
-                    <label for="errorCost">Coût moyen d'une erreur (€)</label>
+                    <label for="errorCost">Coût moyen d'une erreur (€) 
+                        <span class="help-tooltip">ℹ️
+                            <span class="tooltip-text">
+                                Coût en temps de correction + impact business 
+                                (client mécontent, retard, etc.)
+                            </span>
+                        </span>
+                    </label>
                     <input type="number" id="errorCost" placeholder="Ex: 150">
                 </div>
+
+                <div class="validation-message" id="step2-validation"></div>
             </div>
+        </div>
 
-            <!-- Configuration de l'Automation -->
+        <!-- Étape 3: Solution d'automation -->
+        <div class="wizard-step" id="step3">
             <div class="card">
-                <div class="card-title">
-                    Solution d'Automation
+                <div class="card-title">🤖 Étape 3: Paramètres de la solution d'automation</div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="automationCost">Coût de développement (€) 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Investissement initial pour développer la solution 
+                                    (développement, intégration, tests).
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="automationCost" placeholder="Ex: 15000">
+                        <div class="validation-message" id="automationCost-validation"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="implementationTime">Temps d'implémentation (semaines) 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Durée estimée pour mettre en place la solution 
+                                    et former les équipes.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="implementationTime" placeholder="Ex: 8">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="automationCost">Coût de développement (€)</label>
-                    <input type="number" id="automationCost" placeholder="Ex: 15000">
-                </div>
-
-                <div class="form-group">
-                    <label for="implementationTime">Temps d'implémentation (semaines)</label>
-                    <input type="number" id="implementationTime" placeholder="Ex: 8">
-                </div>
-
-                <div class="form-group">
-                    <label for="automationEfficiency">Efficacité de l'automation (%)</label>
+                    <label for="automationEfficiency">Efficacité de l'automation (%) 
+                        <span class="help-tooltip">ℹ️
+                            <span class="tooltip-text">
+                                Pourcentage de tâches automatisées. 100% = automation complète, 
+                                80% = encore 20% de tâches manuelles.
+                            </span>
+                        </span>
+                    </label>
                     <input type="number" id="automationEfficiency" placeholder="Ex: 95" value="95">
                 </div>
 
-                <div class="form-group">
-                    <label for="maintenanceCost">Coût de maintenance annuel (€)</label>
-                    <input type="number" id="maintenanceCost" placeholder="Ex: 2000">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="maintenanceCost">Maintenance annuelle (€) 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Coût annuel de maintenance, mises à jour, 
+                                    et évolutions mineures.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="maintenanceCost" placeholder="Ex: 2000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="toolsCost">Licences/outils annuel (€) 
+                            <span class="help-tooltip">ℹ️
+                                <span class="tooltip-text">
+                                    Coût des licences et outils nécessaires 
+                                    au fonctionnement de l'automation.
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" id="toolsCost" placeholder="Ex: 1200">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="toolsCost">Coût des outils/licences annuel (€)</label>
-                    <input type="number" id="toolsCost" placeholder="Ex: 1200">
-                </div>
-
-                <div class="form-group">
-                    <label for="trainingCost">Coût de formation (€)</label>
+                    <label for="trainingCost">Coût de formation (€) 
+                        <span class="help-tooltip">ℹ️
+                            <span class="tooltip-text">
+                                Investissement one-shot pour former les équipes 
+                                à utiliser la nouvelle solution.
+                            </span>
+                        </span>
+                    </label>
                     <input type="number" id="trainingCost" placeholder="Ex: 3000">
                 </div>
 
-                <button class="btn" onclick="calculateROI()">
-                    📊 Calculer le ROI
-                </button>
+                <div class="validation-message" id="step3-validation"></div>
+
+                <!-- Bouton de calcul ROI -->
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #d4c1e1;">
+                    <p style="margin-bottom: 20px; font-size: 1.1em; opacity: 0.9;">
+                        Prêt à découvrir votre ROI ? 🚀
+                    </p>
+                    <button class="btn" onclick="calculateROI()" style="max-width: 300px; margin: 0 auto;">
+                        📊 Calculer le ROI Complet
+                    </button>
+                </div>
             </div>
+        </div>
+
+        <!-- Navigation wizard -->
+        <div class="wizard-navigation">
+            <button class="wizard-btn prev" id="prevBtn" disabled>← Précédent</button>
+            <button class="wizard-btn next" id="nextBtn" disabled>Suivant →</button>
         </div>
 
         <!-- Section Résultats -->
@@ -519,7 +601,7 @@
 
             <div id="resultsContent" style="display: none;">
                 <h2 class="section-title">
-                    Analyse ROI <span class="highlight">Complète</span>
+                    Analyse ROI <span style="color: #4ba37b; font-weight: 600;">Complète</span>
                 </h2>
 
                 <!-- Métriques principales -->
@@ -542,72 +624,59 @@
                     </div>
                 </div>
 
-                <!-- Graphique ROI dans le temps -->
-                <div class="chart-container">
-                    <canvas id="roiChart"></canvas>
-                </div>
-
                 <!-- Détail des coûts -->
-                <div class="cost-breakdown">
-                    <div class="cost-item">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 30px 0;">
+                    <div style="background: rgba(212, 193, 225, 0.1); padding: 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 2px solid #d4c1e1;">
                         <span>Coût actuel annuel</span>
                         <span id="currentAnnualCost">0€</span>
                     </div>
-                    <div class="cost-item">
+                    <div style="background: rgba(212, 193, 225, 0.1); padding: 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 2px solid #d4c1e1;">
                         <span>Coût avec automation annuel</span>
                         <span id="automatedAnnualCost">0€</span>
                     </div>
-                    <div class="cost-item">
+                    <div style="background: rgba(212, 193, 225, 0.1); padding: 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 2px solid #d4c1e1;">
                         <span>Économies annuelles</span>
-                        <span id="annualSavings" class="highlight">0€</span>
+                        <span id="annualSavings" style="color: #4ba37b; font-weight: 600;">0€</span>
                     </div>
-                    <div class="cost-item">
+                    <div style="background: rgba(212, 193, 225, 0.1); padding: 25px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 2px solid #d4c1e1;">
                         <span>Temps économisé par mois</span>
                         <span id="timeSaved">0h</span>
                     </div>
                 </div>
 
-                <!-- Timeline sur 3 ans -->
-                <div class="timeline-view">
-                    <h3 style="margin-bottom: 25px; color: #d4c1e1; font-size: 1.4em;">Projection sur 3 ans</h3>
-                    <div class="timeline-year">
-                        <span class="year-label">Année 1</span>
-                        <span class="year-savings" id="year1Savings">0€</span>
-                    </div>
-                    <div class="timeline-year">
-                        <span class="year-label">Année 2</span>
-                        <span class="year-savings" id="year2Savings">0€</span>
-                    </div>
-                    <div class="timeline-year">
-                        <span class="year-label">Année 3</span>
-                        <span class="year-savings" id="year3Savings">0€</span>
-                    </div>
+                <!-- Graphique de projection sur 3 ans -->
+                <div class="chart-container">
+                    <canvas id="roiChart"></canvas>
                 </div>
 
                 <!-- Recommandations -->
-                <div class="recommendations">
-                    <h3>Recommandations Stratégiques</h3>
-                    <ul id="recommendationsList">
+                <div style="background: rgba(212, 193, 225, 0.1); padding: 35px; border-radius: 18px; margin-top: 30px; border: 2px solid #d4c1e1;">
+                    <h3 style="margin-bottom: 25px; font-size: 1.5em; color: #d4c1e1;">Recommandations Stratégiques</h3>
+                    <ul id="recommendationsList" style="list-style: none;">
                         <!-- Rempli dynamiquement -->
                     </ul>
                 </div>
-
-                <!-- Boutons d'export -->
-                <button class="btn export-btn" onclick="generateReport()">
-                    📄 Générer Rapport PDF
-                </button>
             </div>
         </div>
         
         <!-- Footer avec logo -->
         <div style="text-align: center; margin-top: 60px; padding: 30px;">
-            <a href="https://www.phosphoregarden.fr" target="_blank">
-                <img src="logo.png" alt="Phosphore Garden" style="height: 80px; opacity: 0.7; cursor: pointer;" onerror="this.outerHTML='<div style=\'color: #d4c1e1; font-size: 1.5em; font-weight: 300; cursor: pointer;\'>Phosphore<br>GARDEN</div>'">
+            <a href="https://www.phosphoregarden.fr" target="_blank" style="display: inline-block; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <img src="logo.png" alt="Phosphore Garden" style="height: 60px; opacity: 0.8; cursor: pointer;" onerror="this.outerHTML='<div style=\'color: #d4c1e1; font-size: 1.5em; font-weight: 300; cursor: pointer; padding: 20px; border: 2px solid #d4c1e1; border-radius: 10px; display: inline-block;\'>Phosphore<br>GARDEN</div>'">
             </a>
+            <p style="margin-top: 15px; font-size: 0.9em; color: #f9f5ef; opacity: 0.8;">
+                Accompagnement et conception de solutions d'IA / d'automatisation
+            </p>
         </div>
     </div>
 
     <script>
+        // Variables globales
+        let currentStep = 1;
+        const totalSteps = 3;
+        let selectedSector = null;
+        let roiChart = null;
+
         // Templates de process prédéfinis
         const processTemplates = {
             rh: {
@@ -645,19 +714,71 @@
                 hourlyRate: 25,
                 errorRate: 5,
                 errorCost: 80
+            },
+            sante: {
+                name: "Gestion dossiers patients",
+                description: "Saisie données médicales, planification RDV, suivi traitements",
+                timePerTask: 45,
+                frequency: 200,
+                hourlyRate: 45,
+                errorRate: 12,
+                errorCost: 800
+            },
+            juridique: {
+                name: "Traitement contrats",
+                description: "Analyse clauses, recherche jurisprudence, validation légale",
+                timePerTask: 90,
+                frequency: 80,
+                hourlyRate: 80,
+                errorRate: 5,
+                errorCost: 2000
+            },
+            ecommerce: {
+                name: "Gestion commandes",
+                description: "Traitement commandes, suivi livraisons, service client",
+                timePerTask: 12,
+                frequency: 600,
+                hourlyRate: 22,
+                errorRate: 8,
+                errorCost: 150
+            },
+            industrie: {
+                name: "Contrôle qualité",
+                description: "Inspection produits, saisie données, génération rapports",
+                timePerTask: 35,
+                frequency: 180,
+                hourlyRate: 38,
+                errorRate: 15,
+                errorCost: 1200
             }
         };
 
-        let roiChart = null;
-
-        function loadTemplate(templateType) {
-            // Mettre à jour les boutons
+        // Fonction pour sélectionner un secteur
+        function selectSector(sectorType, buttonElement) {
+            console.log('Secteur sélectionné:', sectorType);
+            
+            // Retirer la classe active de tous les boutons
             document.querySelectorAll('.template-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
-
-            if (templateType === 'custom') {
+            
+            // Ajouter la classe active au bouton cliqué
+            buttonElement.classList.add('active');
+            
+            // Stocker le secteur sélectionné
+            selectedSector = sectorType;
+            
+            // Charger le template correspondant
+            if (sectorType !== 'custom' && processTemplates[sectorType]) {
+                const template = processTemplates[sectorType];
+                document.getElementById('processName').value = template.name;
+                document.getElementById('taskDescription').value = template.description;
+                document.getElementById('timePerTask').value = template.timePerTask;
+                document.getElementById('frequency').value = template.frequency;
+                document.getElementById('hourlyRate').value = template.hourlyRate;
+                document.getElementById('errorRate').value = template.errorRate;
+                document.getElementById('errorCost').value = template.errorCost;
+            } else if (sectorType === 'custom') {
                 // Vider les champs pour un template personnalisé
                 document.getElementById('processName').value = '';
                 document.getElementById('taskDescription').value = '';
@@ -666,23 +787,220 @@
                 document.getElementById('hourlyRate').value = '';
                 document.getElementById('errorRate').value = '';
                 document.getElementById('errorCost').value = '';
-                return;
             }
+            
+            // Afficher message de validation
+            showValidation('step1-validation', 'Secteur sélectionné !', true);
+            
+            // Activer le bouton suivant
+            enableNextButton();
+        }
 
-            const template = processTemplates[templateType];
-            if (template) {
-                document.getElementById('processName').value = template.name;
-                document.getElementById('taskDescription').value = template.description;
-                document.getElementById('timePerTask').value = template.timePerTask;
-                document.getElementById('frequency').value = template.frequency;
-                document.getElementById('hourlyRate').value = template.hourlyRate;
-                document.getElementById('errorRate').value = template.errorRate;
-                document.getElementById('errorCost').value = template.errorCost;
+        // Fonction pour passer à l'étape suivante
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                // Masquer l'étape actuelle
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('completed');
+                
+                currentStep++;
+                
+                // Afficher la nouvelle étape
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('active');
+                
+                updateNavigationButtons();
             }
         }
 
+        // Fonction pour revenir à l'étape précédente
+        function previousStep() {
+            if (currentStep > 1) {
+                // Masquer l'étape actuelle
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+                
+                currentStep--;
+                
+                // Afficher l'étape précédente
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.add('active');
+                document.getElementById(`step${currentStep}-indicator`).classList.remove('completed');
+                
+                updateNavigationButtons();
+            }
+        }
+
+        // Mettre à jour les boutons de navigation
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            // Bouton précédent
+            prevBtn.disabled = currentStep === 1;
+            
+            // Bouton suivant
+            if (currentStep === totalSteps) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+                checkStepValidation();
+            }
+        }
+
+        // Vérifier la validation de l'étape
+        function checkStepValidation() {
+            let isValid = false;
+            
+            switch (currentStep) {
+                case 1:
+                    isValid = selectedSector !== null;
+                    break;
+                case 2:
+                    isValid = validateStep2();
+                    break;
+                case 3:
+                    isValid = validateStep3();
+                    break;
+            }
+            
+            if (isValid) {
+                enableNextButton();
+            } else {
+                disableNextButton();
+            }
+        }
+
+        // Validation étape 2
+        function validateStep2() {
+            const processName = document.getElementById('processName').value.trim();
+            const timePerTask = parseFloat(document.getElementById('timePerTask').value) || 0;
+            const frequency = parseFloat(document.getElementById('frequency').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            
+            let isValid = true;
+            let errors = [];
+            
+            if (!processName) {
+                showValidation('processName-validation', 'Le nom du process est requis', false);
+                errors.push('Nom du process');
+                isValid = false;
+            } else {
+                hideValidation('processName-validation');
+            }
+            
+            if (timePerTask <= 0) {
+                showValidation('timePerTask-validation', 'Le temps doit être supérieur à 0', false);
+                errors.push('Temps par tâche');
+                isValid = false;
+            } else if (timePerTask > 480) {
+                showValidation('timePerTask-validation', 'Temps très élevé, vérifiez la saisie', false);
+                errors.push('Temps par tâche (trop élevé)');
+                isValid = false;
+            } else {
+                hideValidation('timePerTask-validation');
+            }
+            
+            if (frequency <= 0) {
+                showValidation('frequency-validation', 'La fréquence doit être supérieure à 0', false);
+                errors.push('Fréquence par mois');
+                isValid = false;
+            } else if (frequency > 10000) {
+                showValidation('frequency-validation', 'Fréquence très élevée, vérifiez la saisie', false);
+                errors.push('Fréquence par mois (trop élevée)');
+                isValid = false;
+            } else {
+                hideValidation('frequency-validation');
+            }
+            
+            if (hourlyRate <= 0) {
+                showValidation('hourlyRate-validation', 'Le coût horaire doit être supérieur à 0', false);
+                errors.push('Coût horaire employé');
+                isValid = false;
+            } else if (hourlyRate > 200) {
+                showValidation('hourlyRate-validation', 'Coût très élevé, vérifiez la saisie', false);
+                errors.push('Coût horaire employé (trop élevé)');
+                isValid = false;
+            } else {
+                hideValidation('hourlyRate-validation');
+            }
+            
+            if (isValid) {
+                hideValidation('step2-validation');
+            } else {
+                showValidation('step2-validation', 'Champs requis: ' + errors.join(', '), false);
+            }
+            
+            return isValid;
+        }
+
+        // Validation étape 3
+        function validateStep3() {
+            const automationCost = parseFloat(document.getElementById('automationCost').value) || 0;
+            let isValid = true;
+            let errors = [];
+            
+            if (automationCost <= 0) {
+                showValidation('automationCost-validation', 'Le coût de développement est requis', false);
+                errors.push('Coût de développement');
+                isValid = false;
+            } else if (automationCost > 1000000) {
+                showValidation('automationCost-validation', 'Coût très élevé, vérifiez la saisie', false);
+                errors.push('Coût de développement (trop élevé)');
+                isValid = false;
+            } else {
+                hideValidation('automationCost-validation');
+            }
+            
+            if (isValid) {
+                hideValidation('step3-validation');
+            } else {
+                showValidation('step3-validation', 'Champs requis: ' + errors.join(', '), false);
+            }
+            
+            return isValid;
+        }
+
+        // Activer le bouton suivant
+        function enableNextButton() {
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.disabled = false;
+            }
+        }
+
+        // Désactiver le bouton suivant
+        function disableNextButton() {
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) {
+                nextBtn.disabled = true;
+            }
+        }
+
+        // Afficher un message de validation
+        function showValidation(elementId, message, isSuccess) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.className = isSuccess ? 'validation-message validation-success' : 'validation-message validation-error';
+                element.style.display = 'block';
+            }
+        }
+
+        // Masquer un message de validation
+        function hideValidation(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.style.display = 'none';
+            }
+        }
+
+        // Fonction de calcul ROI
         function calculateROI() {
-            // Récupérer les valeurs
+            console.log('Calcul ROI lancé');
+            
+            // Récupérer les valeurs avec gestion d'erreur
             const timePerTask = parseFloat(document.getElementById('timePerTask').value) || 0;
             const frequency = parseFloat(document.getElementById('frequency').value) || 0;
             const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
@@ -695,79 +1013,102 @@
             const trainingCost = parseFloat(document.getElementById('trainingCost').value) || 0;
             const automationEfficiency = parseFloat(document.getElementById('automationEfficiency').value) || 95;
 
-            // Validation
-            if (timePerTask === 0 || frequency === 0 || hourlyRate === 0) {
-                alert('Veuillez remplir au minimum le temps par tâche, la fréquence et le coût horaire.');
+            console.log('Valeurs récupérées:', {
+                timePerTask, frequency, hourlyRate, automationCost
+            });
+
+            // Validation améliorée avec messages spécifiques
+            const missingFields = [];
+            if (timePerTask === 0) missingFields.push('Temps par tâche');
+            if (frequency === 0) missingFields.push('Fréquence par mois');
+            if (hourlyRate === 0) missingFields.push('Coût horaire employé');
+            if (automationCost === 0) missingFields.push('Coût de développement');
+
+            if (missingFields.length > 0) {
+                alert('⚠️ Champs obligatoires manquants:\n\n• ' + missingFields.join('\n• ') + '\n\nVeuillez compléter ces informations pour continuer.');
                 return;
             }
+
+            console.log('Validation réussie, début des calculs...');
 
             // Afficher la section résultats avec loading
             document.getElementById('resultsSection').style.display = 'block';
             document.getElementById('loadingDiv').style.display = 'block';
             document.getElementById('resultsContent').style.display = 'none';
 
-            // Simuler un délai de calcul
+            // Simuler un délai de calcul réduit pour debug
             setTimeout(() => {
-                // Calculs
-                const monthlyTimeSpent = (timePerTask / 60) * frequency; // heures
-                const currentMonthlyCost = monthlyTimeSpent * hourlyRate;
-                const currentAnnualCost = currentMonthlyCost * 12;
+                console.log('Début des calculs détaillés...');
                 
-                const monthlyErrors = (frequency * errorRate) / 100;
-                const monthlyErrorCost = monthlyErrors * errorCost;
-                const annualErrorCost = monthlyErrorCost * 12;
-                
-                const totalCurrentAnnualCost = currentAnnualCost + annualErrorCost;
-                
-                // Coûts avec automation
-                const automatedTimeSpent = monthlyTimeSpent * (1 - automationEfficiency / 100);
-                const automatedMonthlyCost = automatedTimeSpent * hourlyRate;
-                const automatedAnnualCost = automatedMonthlyCost * 12 + maintenanceCost + toolsCost;
-                
-                const annualSavings = totalCurrentAnnualCost - automatedAnnualCost;
-                const totalInvestment = automationCost + trainingCost;
-                
-                // Calculs sur 3 ans
-                const year1Savings = annualSavings - totalInvestment;
-                const year2Savings = annualSavings;
-                const year3Savings = annualSavings;
-                const totalSavings3Years = year1Savings + year2Savings + year3Savings;
-                
-                const roi = ((totalSavings3Years / totalInvestment) * 100);
-                const paybackMonths = Math.ceil(totalInvestment / annualSavings * 12);
-                
-                const inactionCost = totalCurrentAnnualCost * 3;
-                
-                // Afficher les résultats
-                document.getElementById('totalSavings').textContent = formatCurrency(totalSavings3Years);
-                document.getElementById('roiPercentage').textContent = Math.round(roi) + '%';
-                document.getElementById('paybackPeriod').textContent = paybackMonths + ' mois';
-                document.getElementById('inactionCost').textContent = formatCurrency(inactionCost);
-                
-                document.getElementById('currentAnnualCost').textContent = formatCurrency(totalCurrentAnnualCost);
-                document.getElementById('automatedAnnualCost').textContent = formatCurrency(automatedAnnualCost);
-                document.getElementById('annualSavings').textContent = formatCurrency(annualSavings);
-                document.getElementById('timeSaved').textContent = Math.round(monthlyTimeSpent - automatedTimeSpent) + 'h';
-                
-                document.getElementById('year1Savings').textContent = formatCurrency(year1Savings);
-                document.getElementById('year2Savings').textContent = formatCurrency(year2Savings);
-                document.getElementById('year3Savings').textContent = formatCurrency(year3Savings);
-                
-                // Générer les recommandations
-                generateRecommendations(roi, paybackMonths, annualSavings);
-                
-                // Créer le graphique
-                createROIChart(totalInvestment, year1Savings, year2Savings, year3Savings);
-                
-                // Masquer le loading et afficher les résultats
-                document.getElementById('loadingDiv').style.display = 'none';
-                document.getElementById('resultsContent').style.display = 'block';
-                
-                // Scroll vers les résultats
-                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-            }, 2000);
+                try {
+                    // Calculs
+                    const monthlyTimeSpent = (timePerTask / 60) * frequency; // heures
+                    const currentMonthlyCost = monthlyTimeSpent * hourlyRate;
+                    const currentAnnualCost = currentMonthlyCost * 12;
+                    
+                    const monthlyErrors = (frequency * errorRate) / 100;
+                    const monthlyErrorCost = monthlyErrors * errorCost;
+                    const annualErrorCost = monthlyErrorCost * 12;
+                    
+                    const totalCurrentAnnualCost = currentAnnualCost + annualErrorCost;
+                    
+                    // Coûts avec automation
+                    const automatedTimeSpent = monthlyTimeSpent * (1 - automationEfficiency / 100);
+                    const automatedMonthlyCost = automatedTimeSpent * hourlyRate;
+                    const automatedAnnualCost = automatedMonthlyCost * 12 + maintenanceCost + toolsCost;
+                    
+                    const annualSavings = totalCurrentAnnualCost - automatedAnnualCost;
+                    const totalInvestment = automationCost + trainingCost;
+                    
+                    // Calculs sur 3 ans
+                    const year1Savings = Math.max(0, annualSavings - totalInvestment);
+                    const year2Savings = annualSavings;
+                    const year3Savings = annualSavings;
+                    const totalSavings3Years = year1Savings + year2Savings + year3Savings;
+                    
+                    const roi = totalInvestment > 0 ? ((totalSavings3Years / totalInvestment) * 100) : 0;
+                    const paybackMonths = annualSavings > 0 ? Math.ceil(totalInvestment / annualSavings * 12) : 999;
+                    
+                    const inactionCost = totalCurrentAnnualCost * 3;
+
+                    console.log('Calculs terminés:', {
+                        totalSavings3Years, roi, paybackMonths, inactionCost
+                    });
+                    
+                    // Afficher les métriques principales
+                    document.getElementById('totalSavings').textContent = formatCurrency(totalSavings3Years);
+                    document.getElementById('roiPercentage').textContent = Math.round(roi) + '%';
+                    document.getElementById('paybackPeriod').textContent = paybackMonths > 60 ? '> 5 ans' : paybackMonths + ' mois';
+                    document.getElementById('inactionCost').textContent = formatCurrency(inactionCost);
+                    
+                    document.getElementById('currentAnnualCost').textContent = formatCurrency(totalCurrentAnnualCost);
+                    document.getElementById('automatedAnnualCost').textContent = formatCurrency(automatedAnnualCost);
+                    document.getElementById('annualSavings').textContent = formatCurrency(annualSavings);
+                    document.getElementById('timeSaved').textContent = Math.round(monthlyTimeSpent - automatedTimeSpent) + 'h';
+                    
+                    // Créer le graphique de projection
+                    createROIChart(totalInvestment, year1Savings, year2Savings, year3Savings);
+                    
+                    // Générer les recommandations
+                    generateRecommendations(roi, paybackMonths, annualSavings);
+                    
+                    // Masquer le loading et afficher les résultats
+                    document.getElementById('loadingDiv').style.display = 'none';
+                    document.getElementById('resultsContent').style.display = 'block';
+                    
+                    console.log('Affichage des résultats terminé');
+                    
+                    // Scroll vers les résultats
+                    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error('Erreur lors des calculs:', error);
+                    alert('❌ Une erreur est survenue lors du calcul. Veuillez vérifier vos données et réessayer.');
+                    document.getElementById('resultsSection').style.display = 'none';
+                }
+            }, 800); // Réduit à 800ms pour debug
         }
 
+        // Formater les montants en euros
         function formatCurrency(amount) {
             return new Intl.NumberFormat('fr-FR', {
                 style: 'currency',
@@ -777,61 +1118,84 @@
             }).format(amount);
         }
 
+        // Générer les recommandations
         function generateRecommendations(roi, paybackMonths, annualSavings) {
             const recommendations = [];
             
             if (roi > 200) {
-                recommendations.push("ROI excellent (+" + Math.round(roi) + "%) - Priorité MAXIMUM pour ce projet");
+                recommendations.push("🔥 ROI excellent (+" + Math.round(roi) + "%) - Priorité MAXIMUM pour ce projet");
             } else if (roi > 100) {
-                recommendations.push("ROI très intéressant - Projet hautement recommandé");
+                recommendations.push("✅ ROI très intéressant - Projet hautement recommandé");
             } else if (roi > 50) {
-                recommendations.push("ROI correct - Projet viable à moyen terme");
+                recommendations.push("👍 ROI correct - Projet viable à moyen terme");
             } else {
-                recommendations.push("ROI faible - Revoir les paramètres ou repenser l'approche");
+                recommendations.push("⚠️ ROI faible - Revoir les paramètres ou repenser l'approche");
             }
             
             if (paybackMonths <= 12) {
-                recommendations.push("Retour sur investissement rapide (< 1 an) - Excellent argument commercial");
+                recommendations.push("⚡ Retour sur investissement rapide (< 1 an) - Excellent argument commercial");
             } else if (paybackMonths <= 24) {
-                recommendations.push("Retour sur investissement raisonnable (< 2 ans)");
+                recommendations.push("📈 Retour sur investissement raisonnable (< 2 ans)");
             }
             
             if (annualSavings > 50000) {
-                recommendations.push("Économies substantielles - Impact significatif sur la rentabilité");
+                recommendations.push("💰 Économies substantielles - Impact significatif sur la rentabilité");
             }
             
-            recommendations.push("Commencer par un pilote sur une partie du process pour valider les gains");
-            recommendations.push("Prévoir une formation équipe pour maximiser l'adoption");
-            recommendations.push("Mettre en place des KPIs de suivi pour mesurer les bénéfices réels");
+            recommendations.push("🧪 Commencer par un pilote sur une partie du process pour valider les gains");
+            recommendations.push("👥 Prévoir une formation équipe pour maximiser l'adoption");
+            recommendations.push("📊 Mettre en place des KPIs de suivi pour mesurer les bénéfices réels");
             
             const list = document.getElementById('recommendationsList');
-            list.innerHTML = '';
-            recommendations.forEach(rec => {
-                const li = document.createElement('li');
-                li.textContent = rec;
-                list.appendChild(li);
-            });
+            if (list) {
+                list.innerHTML = '';
+                recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '18px';
+                    li.style.paddingLeft = '30px';
+                    li.style.position = 'relative';
+                    li.style.lineHeight = '1.6';
+                    li.innerHTML = `<span style="position: absolute; left: 0; color: #4ba37b; font-weight: bold; font-size: 1.2em;">→</span>${rec}`;
+                    list.appendChild(li);
+                });
+            }
         }
 
+        // Créer le graphique ROI
         function createROIChart(investment, year1, year2, year3) {
-            const ctx = document.getElementById('roiChart').getContext('2d');
+            const ctx = document.getElementById('roiChart');
+            if (!ctx) return;
             
+            // Détruire le graphique existant s'il y en a un
             if (roiChart) {
                 roiChart.destroy();
             }
             
-            roiChart = new Chart(ctx, {
+            // Calculer les valeurs cumulées
+            const cumulativeValues = [
+                -investment, // Investissement initial (négatif)
+                year1 - investment, // Fin année 1
+                year1 + year2 - investment, // Fin année 2
+                year1 + year2 + year3 - investment // Fin année 3
+            ];
+            
+            roiChart = new Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: ['Investissement Initial', 'Fin Année 1', 'Fin Année 2', 'Fin Année 3'],
                     datasets: [{
                         label: 'ROI Cumulé (€)',
-                        data: [-investment, year1 - investment, year1 + year2 - investment, year1 + year2 + year3 - investment],
+                        data: cumulativeValues,
                         borderColor: '#4ba37b',
                         backgroundColor: 'rgba(75, 163, 123, 0.1)',
-                        borderWidth: 3,
+                        borderWidth: 4,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointBackgroundColor: '#4ba37b',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 3,
+                        pointRadius: 8,
+                        pointHoverRadius: 10
                     }]
                 },
                 options: {
@@ -842,10 +1206,19 @@
                             display: true,
                             text: 'Évolution du ROI sur 3 ans',
                             color: '#f9f5ef',
-                            font: { size: 16 }
+                            font: { 
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: 20
                         },
                         legend: {
-                            labels: { color: '#f9f5ef' }
+                            labels: { 
+                                color: '#f9f5ef',
+                                font: {
+                                    size: 14
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -853,174 +1226,90 @@
                             beginAtZero: false,
                             ticks: {
                                 color: '#f9f5ef',
+                                font: {
+                                    size: 12
+                                },
                                 callback: function(value) {
                                     return formatCurrency(value);
                                 }
                             },
                             grid: {
                                 color: 'rgba(249, 245, 239, 0.1)'
+                            },
+                            title: {
+                                display: true,
+                                text: 'ROI Cumulé (€)',
+                                color: '#f9f5ef',
+                                font: {
+                                    size: 14
+                                }
                             }
                         },
                         x: {
                             ticks: {
-                                color: '#f9f5ef'
+                                color: '#f9f5ef',
+                                font: {
+                                    size: 12
+                                }
                             },
                             grid: {
                                 color: 'rgba(249, 245, 239, 0.1)'
                             }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    elements: {
+                        point: {
+                            hoverBorderWidth: 4
                         }
                     }
                 }
             });
         }
 
-        function generateReport() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        // Initialisation de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page chargée, initialisation...');
             
-            // Configuration
-            const pageWidth = doc.internal.pageSize.width;
-            const margin = 20;
-            let yPosition = 30;
-            
-            // Header avec logo et titre
-            doc.setFontSize(20);
-            doc.setTextColor(45, 48, 49); // Couleur sombre
-            doc.text('Rapport ROI d\'Automation', pageWidth/2, yPosition, { align: 'center' });
-            
-            yPosition += 10;
-            doc.setFontSize(12);
-            doc.setTextColor(212, 193, 225); // Couleur violette
-            doc.text('Phosphore Garden', pageWidth/2, yPosition, { align: 'center' });
-            
-            yPosition += 30;
-            
-            // Informations du projet
-            doc.setFontSize(14);
-            doc.setTextColor(45, 48, 49);
-            doc.text('Projet analysé:', margin, yPosition);
-            yPosition += 8;
-            
-            doc.setFontSize(12);
-            const processName = document.getElementById('processName').value || 'Non spécifié';
-            doc.text(`Process: ${processName}`, margin, yPosition);
-            yPosition += 6;
-            
-            const taskDesc = document.getElementById('taskDescription').value || 'Non spécifié';
-            const wrappedDesc = doc.splitTextToSize(`Description: ${taskDesc}`, pageWidth - 2 * margin);
-            doc.text(wrappedDesc, margin, yPosition);
-            yPosition += wrappedDesc.length * 6 + 10;
-            
-            // Métriques principales
-            doc.setFontSize(16);
-            doc.setTextColor(233, 161, 61); // Couleur dorée
-            doc.text('Résultats financiers', margin, yPosition);
-            yPosition += 15;
-            
-            doc.setFontSize(12);
-            doc.setTextColor(45, 48, 49);
-            
-            const totalSavings = document.getElementById('totalSavings').textContent;
-            const roiPercentage = document.getElementById('roiPercentage').textContent;
-            const paybackPeriod = document.getElementById('paybackPeriod').textContent;
-            const inactionCost = document.getElementById('inactionCost').textContent;
-            
-            doc.text(`• Économies sur 3 ans: ${totalSavings}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Retour sur investissement: ${roiPercentage}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Période de retour: ${paybackPeriod}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Coût de l'inaction: ${inactionCost}`, margin, yPosition);
-            yPosition += 20;
-            
-            // Détail des coûts
-            doc.setFontSize(16);
-            doc.setTextColor(233, 161, 61);
-            doc.text('Détail des coûts', margin, yPosition);
-            yPosition += 15;
-            
-            doc.setFontSize(12);
-            doc.setTextColor(45, 48, 49);
-            
-            const currentCost = document.getElementById('currentAnnualCost').textContent;
-            const automatedCost = document.getElementById('automatedAnnualCost').textContent;
-            const annualSavings = document.getElementById('annualSavings').textContent;
-            const timeSaved = document.getElementById('timeSaved').textContent;
-            
-            doc.text(`• Coût actuel annuel: ${currentCost}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Coût avec automation: ${automatedCost}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Économies annuelles: ${annualSavings}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Temps économisé/mois: ${timeSaved}`, margin, yPosition);
-            yPosition += 20;
-            
-            // Projection 3 ans
-            doc.setFontSize(16);
-            doc.setTextColor(233, 161, 61);
-            doc.text('Projection sur 3 ans', margin, yPosition);
-            yPosition += 15;
-            
-            doc.setFontSize(12);
-            doc.setTextColor(45, 48, 49);
-            
-            const year1 = document.getElementById('year1Savings').textContent;
-            const year2 = document.getElementById('year2Savings').textContent;
-            const year3 = document.getElementById('year3Savings').textContent;
-            
-            doc.text(`• Année 1: ${year1}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Année 2: ${year2}`, margin, yPosition);
-            yPosition += 8;
-            doc.text(`• Année 3: ${year3}`, margin, yPosition);
-            yPosition += 20;
-            
-            // Recommandations
-            if (yPosition > 250) {
-                doc.addPage();
-                yPosition = 30;
-            }
-            
-            doc.setFontSize(16);
-            doc.setTextColor(233, 161, 61);
-            doc.text('Recommandations', margin, yPosition);
-            yPosition += 15;
-            
-            doc.setFontSize(11);
-            doc.setTextColor(45, 48, 49);
-            
-            const recommendations = document.querySelectorAll('#recommendationsList li');
-            recommendations.forEach(rec => {
-                const text = `• ${rec.textContent}`;
-                const wrappedText = doc.splitTextToSize(text, pageWidth - 2 * margin);
-                doc.text(wrappedText, margin, yPosition);
-                yPosition += wrappedText.length * 6 + 3;
-                
-                if (yPosition > 270) {
-                    doc.addPage();
-                    yPosition = 30;
+            // Ajouter les event listeners pour les boutons secteur
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sector = this.getAttribute('data-sector');
+                    selectSector(sector, this);
+                });
+            });
+
+            // Ajouter les event listeners pour la navigation
+            document.getElementById('nextBtn').addEventListener('click', nextStep);
+            document.getElementById('prevBtn').addEventListener('click', previousStep);
+
+            // Ajouter les event listeners pour la validation des champs
+            // Étape 2
+            ['processName', 'timePerTask', 'frequency', 'hourlyRate'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', checkStepValidation);
+                    field.addEventListener('input', checkStepValidation);
                 }
             });
+
+            // Étape 3
+            ['automationCost'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', checkStepValidation);
+                    field.addEventListener('input', checkStepValidation);
+                }
+            });
+
+            // Initialiser les boutons de navigation
+            updateNavigationButtons();
             
-            // Footer
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setFontSize(10);
-                doc.setTextColor(150, 150, 150);
-                doc.text('Rapport généré par Phosphore Garden', pageWidth/2, 285, { align: 'center' });
-                doc.text(`Page ${i} sur ${pageCount}`, pageWidth - margin, 285, { align: 'right' });
-                
-                const today = new Date().toLocaleDateString('fr-FR');
-                doc.text(today, margin, 285);
-            }
-            
-            // Télécharger le PDF
-            const fileName = `rapport-roi-${processName.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`;
-            doc.save(fileName);
-        }
+            console.log('Initialisation terminée');
+        });
     </script>
 </body>
 </html>
